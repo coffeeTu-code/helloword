@@ -76,6 +76,7 @@ func TestStructSize(t *testing.T) {
 		}{}), ShouldEqual, 8)
 	})
 
+	//polaris项目实践
 	Convey("SCreativeAttr", t, func() {
 		So(unsafe.Sizeof(struct {
 			//系统自定义类型
@@ -115,7 +116,6 @@ func TestStructSize(t *testing.T) {
 			Value string
 		}{}), ShouldEqual, 296)
 
-		// |x-xx|xxxx|
 		So(unsafe.Sizeof(struct {
 			ResourceType    int8
 			SubResourceType int8
@@ -147,42 +147,4 @@ func TestStructSize(t *testing.T) {
 			TagCode         string //eq: "http://cdn-adn.rayjump.com/v3/v/19/11/04/13/Iqb90Oo0-e62cfe29-5aca-46e1-a5e5-023062967d9a.mp4"
 		}{}), ShouldEqual, 216)
 	})
-}
-
-type SCreativeAttr struct {
-	//系统自定义类型
-	ResourceType    uint8
-	SubResourceType uint8
-	FormatType      uint8
-	//素材通用类型
-	DocId         string
-	CreativeType  int //"201"
-	CreativeKey   int64
-	CreativeId    int64  //"creativeId" : NumberLong("2753977716"),
-	AdvCreativeId string //eq: "1800060617"
-	Mime          string //"mime" : "video/mp4",
-	Attribute     string //"attribute" : "13，7，6"
-	FMd5          string
-	Source        int
-	Ctime         int64
-	Utime         int64
-	//video素材独有
-	VideoResolution string //"videoResolution" : "1280x720",
-	VideoSize       string //"videoSize" : NumberLong(761894),
-	VideoLength     int    //"videoLength" : NumberLong(18)
-	Bitrate         int    //"bitrate" : NumberLong(334),
-	Clarity         int    //"clarity" : NumberLong(1),
-	Width           int    //"width" : NumberLong(1280),
-	Height          int    //"height" : NumberLong(720),
-	Orientation     int    //"orientation" : NumberLong(2),
-	//pl zip素材
-	MinOs    int64 //eq: 9000000
-	Platform int32 //eq: 2
-	//图片素材
-	Resolution string //eq: "1000x560"
-	Url        string //eq: "http://cdn-adn.rayjump.com/v3/v/19/11/04/13/Iqb90Oo0-e62cfe29-5aca-46e1-a5e5-023062967d9a.mp4"
-	//pl js素材
-	TagCode string //eq: "http://cdn-adn.rayjump.com/v3/v/19/11/04/13/Iqb90Oo0-e62cfe29-5aca-46e1-a5e5-023062967d9a.mp4"
-	//common素材
-	Value string
 }

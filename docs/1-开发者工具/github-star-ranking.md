@@ -38,7 +38,7 @@
 
 - **Github地址**：[https://github.com/tensorflow/tensorflow](https://github.com/tensorflow/tensorflow)
 - **star**: 138 k
-- **介绍**: 适用于所有人的开源机器学习框架。[TensorFlow](https://www.tensorflow.org/)是用于机器学习的端到端开源平台。TensorFlow最初是由Google机器智能研究组织内Google Brain团队的研究人员和工程师开发的，用于进行机器学习和深度神经网络研究。该系统具有足够的通用性，也可以适用于多种其他领域。TensorFlow提供了稳定的[Python](https://www.tensorflow.org/api_docs/python) 和[C ++](https://www.tensorflow.org/api_docs/cc) API，以及[其他语言的](https://www.tensorflow.org/api_docs)非保证的向后兼容API 。
+- **介绍**: 适用于所有人的开源机器学习框架。[TensorFlow](https://www.tensorflow.org/) 是用于机器学习的端到端开源平台。TensorFlow最初是由Google机器智能研究组织内Google Brain团队的研究人员和工程师开发的，用于进行机器学习和深度神经网络研究。该系统具有足够的通用性，也可以适用于多种其他领域。TensorFlow提供了稳定的[Python](https://www.tensorflow.org/api_docs/python) 和[C ++](https://www.tensorflow.org/api_docs/cc) API，以及[其他语言的](https://www.tensorflow.org/api_docs)非保证的向后兼容API 。
 
 ### 6. bootstrap
 
