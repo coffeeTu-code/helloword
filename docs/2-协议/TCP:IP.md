@@ -1,17 +1,12 @@
-<p align='center'>
-<img src='../images/tcp-ip.png'>
-</p>
+# TCP/IP 指南
 
+[TOC]
 
 ## 一. OSI 模型
 
 OSI 参考模型终究只是一个“模型”，它也只是对各层的作用做了一系列粗略的界定，并没有对协议和接口进行详细的定义。它对学习和设计协议只能起到一个引导的作用。因此，若想要了解协议的更多细节，还是有必要参考每个协议本身的具体规范。
 
-
-
-<p align='center'>
-<img src='../images/OSI.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_1.png)
 
 上图是 《图解 TCP/IP》书上对七层模型的定义。
 
@@ -25,32 +20,22 @@ OSI 参考模型终究只是一个“模型”，它也只是对各层的作用�
 | 数据链路层 | 2 | 负责物理层面上互连的、节点之间的通信传输||
 | 物理层 | 1 |负责 0、1 比特流（0、1 序列）与电压的高低、光的闪灭之间的互换||
 
-
-<p align='center'>
-<img src='../images/OSI_Layer.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_3.png)
 
 上图是一些协议在 OSI 模型中的位置。值得注意的是 DNS 是应用层协议，SSL 分别位于第五层会话层和第六层表示层。TLS 位于第五层会话层。（DNS、SSL、TLS 这些协议会在后面详细分析与说明）
 
-
-<p align='center'>
-<img src='../images/OSI-TCP-Model-v1.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_4.png)
 
 上图是 TCP/IP 模型和 OSI 模型的对比图。
 
 
 接下来放2张网络上的图，笔者对图上的内容持有争议，至于下面2张图哪里对哪里错，欢迎开 issue 讨论。
 
-<p align='center'>
-<img src='../images/network-protocol-map-2017-min.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_5.png)
 
 上面这种图说 DNS 是网络层协议，笔者周围很多朋友都一致认为是应用层协议。还有一个错误是 SSL 是跨第六层和第七层的，这里画的还是不对。
 
-<p align='center'>
-<img src='../images/Protocol_Layer.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_6.png)
 
 上面这种图中 DNS 位于应用层，这点赞同，并且也画出了 DNS 是基于 UDP 和 TCP 的。这点也非常不错！（至于有些人不知道 DNS 为何也是基于 TCP 的，这点在 DNS 那里详细分析）。但是上图中没有画出 SSL/TLS 是位于第几层的。
 
@@ -58,32 +43,19 @@ OSI 参考模型终究只是一个“模型”，它也只是对各层的作用�
 
 ## 二. OSI 参考模型通信举例
 
-<p align='center'>
-<img src='../images/TCP-IP-package.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_7.png)
 
 上图是 5 层 TCP/IP 模型中通信时候的数据图。值得说明的一点，在数据链路层的以太网帧里面，除去以太网首部 14 字节，FCS 尾部 4 字节，中间的数据长度在 46-1500 字节之间。
 
+![](https://img.halfrost.com/Blog/ArticleImage/90_8.png)
 
-<p align='center'>
-<img src='../images/how-data-is-processed-in-OSI-and-TCPIP-models.png'>
-</p>
-
-
-
-<p align='center'>
-<img src='../images/package_struc.png'>
-</p>
-
-
+![](https://img.halfrost.com/Blog/ArticleImage/90_9.png)
 
 上图是 OSI 7 层模型中通信时候的数据图。从上图的 7 层模型中，物理层传输的是字节流，数据链路层中包的单位叫，帧。IP、TCP、UDP 网络层的包的单位叫，数据报。TCP、UDP 数据流中的信息叫，段。最后，应用层协议中数据的单位叫，消息。
 
 从第七层应用层一层层的往下，不断的包裹一些协议头，这些协议的头就相当于协议的脸。
 
-<p align='center'>
-<img src='../images/Internet_package.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_10.png)
 
 上图是《网络是怎样连接的》这本书附录里面的一张图。
 
@@ -94,26 +66,18 @@ OSI 参考模型终究只是一个“模型”，它也只是对各层的作用�
 
 TCP/IP 协议的标准化流程大致分为以下几个阶段：首先是互联网草案阶段；其次，如果认为可以进行标准化，就记入 RFC 进入提议标准阶段；第三，是草案标准阶段；最后，才进入真正的标准阶段。
 
-
-<p align='center'>
-<img src='../images/Protocol_standardization.png'>
-</p>
-
+![](https://img.halfrost.com/Blog/ArticleImage/90_11.png)
 
 ## 四. 以太网帧结构
 
 
 在以太网帧前面有一段前导码（Preamble）的部分，用来对端网卡能够确保与其同步的标志。前导码的末尾有一个叫 SFD（Start Frame Delimiter）的域，以太网的 SFD 是末尾的2位 11，IEEE802.3 的 SFD 是末尾的8位，10101011 。
 
-<p align='center'>
-<img src='../images/behind_frame.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_12.png)
 
 以太网帧和 IEEE802.3 帧的结构也有所不同，见下图。
 
-<p align='center'>
-<img src='../images/frame.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_13.png)
 
 帧尾都有一个 4 字节的 FCS（Frame Check Sequence）。FCS 表示帧校验序列(Frame Check Sequence)，用于判断帧是否在传输过程中有损坏(比如电子噪声干扰)。FCS 保存着发送帧除以某个多项式的余数，接收到的帧也做相同计算，如果得到的值与 FCS 相同则表示没有出错。
 
@@ -140,29 +104,19 @@ TCP/IP 协议的标准化流程大致分为以下几个阶段：首先是互联�
 |8864| PPPoE Session Stage||
 |9000| Loopback (Configuration Test Protocol)||
 
-
-
-<p align='center'>
-<img src='../images/thernet_frame.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_15.png)
 
 再来看看 IEEE802.3 帧结构。IEEE802.3 帧结构比以太网帧多了几个部分：帧长度、LLC、SNAP。
 
 数据链路层可以细分成2层：介质访问控制层(Media Access Control，MAC) 和 逻辑链路控制层(Longical Link Control，LLC)。介质访问控制层根据以太网或 FDDI 等不同数据链路所特有的首部信息进行控制。逻辑链路控制层则根据以太网或 FDDI 等不同数据链路所共有的帧头信息进行控制。
 
-
-<p align='center'>
-<img src='../images/LLC_SNAP.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_16.png)
 
 SNAP 总共5个字节，除去前3个字节代表厂商以外，后面2个字节和以太网帧的类型字段含义一样。
 
 在 VLAN 交换机中，帧的结构还会被追加4个字节，成为下面这样子：
 
-
-<p align='center'>
-<img src='../images/VLAN_Frame.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_17.png)
 
 
 ## 五. IP 协议
@@ -205,16 +159,12 @@ IP 属于面向无连接类型，原因有两点：一是为了简化，二是�
 
 以UDP协议发送数据为例：
 
-<p align='center'>
-<img src='../images/MTU_Path.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_19.png)
 
 
 ## 六. IPv4 首部
 
-<p align='center'>
-<img src='../images/IPv4_header.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_20.png)
 
 中间几个字段说明如下：
 
@@ -278,10 +228,7 @@ IPv4 首部版本号为 4 。
 
 ## 七. IPv6 首部
 
-
-<p align='center'>
-<img src='../images/IPv6_header.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_23.png)
 
 - 版本号：
 
@@ -337,11 +284,7 @@ DNS 可以将那串字符串自动转换为具体的 IP 地址。DNS 不仅适�
 
 有一种基本的 DNS 消息格式 [RFC6195] 。它用于所有的 DNS 操作（查询、响应、区域传输、通知和动态更新）
 
-<p align='center'>
-<img src='../images/DNS_header.png'>
-</p>
-
-
+![](https://img.halfrost.com/Blog/ArticleImage/90_25.png)
 
 对于 TCP 和 UDP 来说，DNS 的知名端口号都是 53。最常见的格式使用如下图所示的 UDP/IPv4 的数据报结构。
 
@@ -354,9 +297,7 @@ DNS 可以将那串字符串自动转换为具体的 IP 地址。DNS 不仅适�
 当使用 UDP 时，解析器和服务器应用软件都必须执行自已的超时和重传。在 [RFC1536] 中给出了这方面的建议。它建议起始超时时间至少为 4 秒，随后的超时导致超时时间的指数增长。Linux 和类 UNIX 系统允许通过修改 `/etc/resoIv.conf` 文件(通过设置 timeout 和 attempts 参数)来改变重传超时参数。
 
 
-<p align='center'>
-<img src='../images/DNS_message.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_26.png)
 
 ## 九. ARP (Address Resolution Protocol)
 
@@ -372,9 +313,7 @@ ICMP 主要功能包括，确认 IP 包是否成功送达目标地址，通知�
 
 ## 十一. TCP
 
-<p align='center'>
-<img src='../images/tcp_guide.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_27.png)
 
 - TCP 提供一种面向连接的、可靠的字节流服务。  
 - 在一个 TCP 连接中，仅有两方进行彼此通信。广播和多播不能用于 TCP。  
@@ -394,9 +333,7 @@ IP 协议中的两大关键要素是源 IP 地址和目标 IP 地址。传输层
 
 TCP 首部：**不计算选项字段，TCP 首部的长度为 20 byte**  
 
-<p align='center'>
-<img src='../images/TCP_header.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_28.png)
 
 TCP 中没有单独的字段表示包长度和数据长度。可由 IP 层获知 TCP 的包长，由 TCP 的包长可知数据的长度。
 
@@ -415,9 +352,7 @@ TCP 中没有单独的字段表示包长度和数据长度。可由 IP 层获知
 - 控制位 (Control Flag):    
   字段长为 8 位，从左往右分别如下图：
   
-<p align='center'>
-<img src='../images/control_bits.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_29.png)
 
 CWR (Congestion Window Reduced)：    
 CWR 标志和后面的 ECE 标志都用于 IP 首部的 ECN 字段，ECE 字段为 1 时，则通知对方已将拥塞窗口缩小。
@@ -449,9 +384,7 @@ TCP 的校验和和 UDP 的相似，区别在于 TCP 的校验和无法关闭（
 
 注：TCP 数据报段伪首部起到双重校验的作用：1、通过伪首部的 IP 地址检验，TCP 可以确认 IP 没有接受不是发给本机的数据报；2、通过伪首部的协议字段检验，TCP 可以确认 IP 没有把应该传给其他高层协议（比如UDP、ICMP或者IGMP）的数据报传给 TCP 。
 
-<p align='center'>
-<img src='../images/fake_TCP_header.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_30.png)
 
 
 - 紧急指针：  
@@ -460,18 +393,11 @@ TCP 的校验和和 UDP 的相似，区别在于 TCP 的校验和无法关闭（
 - 选项：    
   选项字段用于提高 TCP 的传输性能，因为根据数据偏移（首部长度）进行控制，所以其长度最大为 40 字节。另外，选项字段尽量调整其为 32 位的整数倍。具有代表性的选项如下图：
   
-<p align='center'>
-<img src='../images/TCP_header_option.png'>
-</p>
-  
-
+![](https://img.halfrost.com/Blog/ArticleImage/90_31.png)
 
 ### TCP 滑动窗口
 
-
-<p align='center'>
-<img src='../images/tcp_slide_windows.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_32.png)
 
 
 窗口是缓存的一部分，用来暂时存放字节流。发送方和接收方各有一个窗口，接收方通过 TCP 报文段中的窗口字段告诉发送方自己的窗口大小，发送方根据这个值和其它信息设置自己的窗口大小。
@@ -504,9 +430,7 @@ TCP 使用超时重传来实现可靠传输：如果一个已经发送的报文�
 
 如果网络出现拥塞，分组将会丢失，此时发送方会继续重传，从而导致网络拥塞程度更高。因此当出现拥塞时，应当控制发送方的速率。这一点和流量控制很像，但是出发点不同。流量控制是为了让接收方能来得及接受，而拥塞控制是为了降低整个网络的拥塞程度。
 
-<p align='center'>
-<img src='../images/tcp_overcrowding.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_33.png)
 
 
 TCP 主要通过四种算法来进行拥塞控制：慢开始、拥塞避免、快重传、快恢复。发送方需要维护一个叫做拥塞窗口（cwnd）的状态变量。注意拥塞窗口与发送方窗口的区别，拥塞窗口只是一个状态变量，实际决定发送方能发送多少数据的是发送方窗口。
@@ -517,9 +441,7 @@ TCP 主要通过四种算法来进行拥塞控制：慢开始、拥塞避免、�
 2. 虽然 TCP 的窗口基于字节，但是这里设窗口的大小单位为报文段。
 
 
-<p align='center'>
-<img src='../images/tcp_cwnd.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_34.png)
 
 ### 1. 慢开始与拥塞避免
 
@@ -537,9 +459,7 @@ TCP 主要通过四种算法来进行拥塞控制：慢开始、拥塞避免、�
 
 在这种情况下，只是丢失个别报文段，而不是网络拥塞，因此执行快恢复，令 ssthresh = cwnd/2 ，cwnd = ssthresh，注意到此时直接进入拥塞避免。
 
-<p align='center'>
-<img src='../images/tcp_retransmission.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_35.png)
 
 
 ## 十二. UDP
@@ -556,9 +476,7 @@ UDP 不提供复杂的控制机制，利用 IP 提供面向无连接的通信服
 
 UDP 首部:  
 
-<p align='center'>
-<img src='../images/UDP_header.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_36.png)
 
 - 包长度：  
   该字段保存了 UDP 首部的长度跟数据的长度之和。
@@ -567,9 +485,7 @@ UDP 首部:
 校验和用来判断数据在传输过程中是否损坏。计算这个校验和的时候，不仅考虑源端口号和目标端口号，还要考虑 IP 首部中的源 IP 地址，目标 IP 地址和协议号（这些又称为 UDP 伪首部）。这是因为以上五个要素用于识别通信时缺一不可，如果校验和只考虑端口号，那么另外三个要素收到破坏时，应用就无法得知。这有可能导致不该收到包的应用收到了包，该收到包的应用反而没有收到。
 
 
-<p align='center'>
-<img src='../images/fake_UDP_header.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_37.png)
 
 UDP 会用到上图中的这个伪首部计算校验和。
 
@@ -592,16 +508,11 @@ UDP 主要用于那些对高速传输和实时性有较高要求的通信或广�
 
 IPv4 地址结构：
 
-<p align='center'>
-<img src='../images/IPv4_addr.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_38.png)
 
 IPv6 地址结构：
 
-
-<p align='center'>
-<img src='../images/IPv6_addr.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_39.png)
 
 
 ## 十五. TCP 三次握手
@@ -630,15 +541,9 @@ IPv6 地址结构：
 
 三次握手的过程的示意图如下：
 
+![](https://img.halfrost.com/Blog/ArticleImage/90_40.png)
 
-
-<p align='center'>
-<img src='../images/tcp-connection-made-three-way-handshake.png'>
-</p>
-
-<p align='center'>
-<img src='../images/tcp_3.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_41.png)
 
 ### 为什么是三次握手
 
@@ -712,14 +617,9 @@ TCP 的连接的拆除需要发送四个包，因此称为四次挥手(Four-way 
 
 四次挥手的示意图如下：
 
+![](https://img.halfrost.com/Blog/ArticleImage/90_42.png)
 
-<p align='center'>
-<img src='../images/tcp-connection-closed-four-way-handshake.png'>
-</p>
-
-<p align='center'>
-<img src='../images/tcp_4.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_43.png)
 
 ### TCP 为什么要进行四次挥手？ / 为什么 TCP 建立连接需要三次，而释放连接则需要四次？
 
@@ -736,15 +636,9 @@ TCP 的连接的拆除需要发送四个包，因此称为四次挥手(Four-way 
 
 如果在处于 TIME\_WAIT 状态的客户端返回 ACK 丢失，会发生什么呢？服务端由于没有接收到 ACK 号，可能会重新发送一次 FIN 。这个时候如果客户端不等待一段时间，直接关闭连接，那么通信中对应的端口号也会释放出来了，这时候如果正好有应用程序创建套接字，又恰好分配了这同一个端口号，接着服务器的 FIN 包又刚好发到。本来是要关闭之前的连接，但是由于端口号相同，这个 FIN 就开始断开这个刚刚建立的新连接。这所以需要等待一段时间，就是为了防止这种误操作。
 
+![](https://img.halfrost.com/Blog/ArticleImage/90_44.png)
 
-<p align='center'>
-<img src='../images/TCP的有限状态机.png'>
-</p>
-
-
-
-
-## 常用端口
+## 十七. 常用端口
 
 知名端口号一般由 0 - 1023 的数字分配而成。
 
@@ -762,19 +656,15 @@ TCP 的连接的拆除需要发送四个包，因此称为四次挥手(Four-way 
 
 TCP 代表的知名端口：
 
-<p align='center'>
-<img src='../images/TCP_port.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_46.png)
 
 UDP 代表的知名端口：
 
-<p align='center'>
-<img src='../images/UDP_port.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_47.png)
 
 
 
-## 十七. Socket Interfaces
+## 十八. Socket Interfaces
 
 
 从 Linux 内核的角度来看，一个套接字就是通信的一个端点。 从 Linux 程序的角度来看，套接字是一个有相应描述符的文件。 普通文件的打开操作返回一个文件描述字，而 socket() 用于创建一个 socket 描述符，唯一标识一个 socket。 这个 socket 描述字跟文件描述字一样，后续的操作都有用到它，把它作为参数，通过它来进行一些操作。
@@ -792,13 +682,9 @@ close()
 
 ### Socket 的交互流程
 
-<p align='center'>
-<img src='../images/socket_interface.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_48.png)
 
-<p align='center'>
-<img src='../images/socket.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/90_49.png)
 
 图中展示了 TCP 协议的 socket 交互流程，描述如下：
 
@@ -816,19 +702,9 @@ close()
 
 这个过程中，服务器和客户端建立连接的部分，就体现了 TCP 三次握手的原理。
 
+---
 
-
-
-
-------------------------------------------------------
-
-Reference：  
-《图解 TCP/IP》  
-《TCP/IP 详解 卷1:协议》  
-《网络是怎样连接的》
-
-> GitHub Repo：[Halfrost-Field](https://github.com/halfrost/Halfrost-Field)
-> 
-> Follow: [halfrost · GitHub](https://github.com/halfrost)
->
-> Source: [https://halfrost.com/tcp\_ip/](https://halfrost.com/tcp_ip/)
+> Reference：  
+> 《图解 TCP/IP》  
+> 《TCP/IP 详解 卷1:协议》  
+> 《网络是怎样连接的》

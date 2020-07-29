@@ -1,10 +1,6 @@
 # 高效的序列化/反序列化数据方式 Protobuf
 
-<p align='center'>
-<img src='../images/protocolbuffers.png'>
-</p>
-
-
+[TOC]
 
 ## 一. protocol buffers 序列化
 
@@ -14,7 +10,7 @@
 
 先新建一个 example 的 message：
 
-```proto
+```
 	syntax = "proto2";
 	package example;
 
@@ -32,7 +28,7 @@
 
 利用 protoc-gen-go 生成对应的 get/ set 方法。代码中就可以用生成的代码进行序列化和反序列化了。
 
-```go
+```
 	package main
 
 	import (
@@ -70,8 +66,7 @@
 
 上面代码中 proto.Marshal() 是序列化过程。proto.Unmarshal() 是反序列化过程。这一章节先看看序列化过程的实现，下一章节再分析反序列化过程的实现。
 
-
-```go
+```
 // Marshal takes the protocol buffer
 // and encodes it into the wire format, returning the data.
 func Marshal(pb Message) ([]byte, error) {
@@ -91,8 +86,7 @@ func Marshal(pb Message) ([]byte, error) {
 
 序列化函数一进来，会先调用 message 对象自身的实现的序列化方法。
 
-
-```go
+```
 // Marshaler is the interface representing objects that can marshal themselves.
 type Marshaler interface {
 	Marshal() ([]byte, error)
@@ -101,7 +95,7 @@ type Marshaler interface {
 
 Marshaler 是一个 interface ，这个接口是专门留给对象自定义序列化的。如果有实现，就 return 自己实现的方法。如果没有，接下来就进行默认序列化方式。
 
-```go
+```
 	p := NewBuffer(nil)
 	err := p.Marshal(pb)
 	if p.buf == nil && err == nil {
@@ -112,7 +106,7 @@ Marshaler 是一个 interface ，这个接口是专门留给对象自定义序�
 
 新建一个 Buffer，调用 Buffer 的 Marshal() 方法。message 经过序列化以后，数据流会放到 Buffer 的 buf 字节流中。序列化最终返回 buf 字节流即可。
 
-```go
+```
 type Buffer struct {
 	buf   []byte // encode/decode byte stream
 	index int    // read point
@@ -130,10 +124,9 @@ type Buffer struct {
 }
 ```
 
-Buffer 的数据结构如上，Buffer 是用于序列化和反序列化 protocol buffers 的缓冲区管理器。它可以在调用的时候重用以减少内存使用量。内部维护了 7 个 pool，3 个基础数据类型的 pool，4 个只能被 pointer\_reflect 使用的 pool。
+Buffer 的数据结构如上，Buffer 是用于序列化和反序列化 protocol buffers 的缓冲区管理器。它可以在调用的时候重用以减少内存使用量。内部维护了 7 个 pool，3 个基础数据类型的 pool，4 个只能被 pointer_reflect 使用的 pool。
 
-
-```go
+```
 func (p *Buffer) Marshal(pb Message) error {
 	// Can the object marshal itself?
 	if m, ok := pb.(Marshaler); ok {
@@ -165,7 +158,7 @@ func (p *Buffer) Marshal(pb Message) error {
 
 Buffer 的 Marshal() 方法依旧先调用一下对象是否实现了 Marshal() 接口，如果实现了，还是让它自己序列化，序列化之后的二进制数据流加入到 buf 数据流中。
 
-```go
+```
 func getbase(pb Message) (t reflect.Type, b structPointer, err error) {
 	if pb == nil {
 		err = ErrNil
@@ -182,9 +175,9 @@ func getbase(pb Message) (t reflect.Type, b structPointer, err error) {
 
 getbase 方法通过 reflect 方法拿到了 message 的类型和对应 value 的结构体指针。拿到结构体指针先做异常处理。
 
-所以序列化最核心的代码其实就一句，p.enc\_struct(GetProperties(t.Elem()), base)
+所以序列化最核心的代码其实就一句，p.enc_struct(GetProperties(t.Elem()), base)
 
-```go
+```
 // Encode a struct.
 func (o *Buffer) enc_struct(prop *StructProperties, base structPointer) error {
 	var state errorState
@@ -236,14 +229,13 @@ func (o *Buffer) enc_struct(prop *StructProperties, base structPointer) error {
 
 	return state.err
 }
-
 ```
 
 上面代码中可以看到，除去 oneof fields 和 unrecognized fields 是单独最后处理的，其他类型都是调用的 p.enc(o, p, base) 进行序列化的。
 
 Properties 的数据结构定义如下：
 
-```go
+```
 type Properties struct {
 	Name     string // name of the field, for error messages
 	OrigName string // original name before protocol compiler (always set)
@@ -290,25 +282,23 @@ type Properties struct {
 	// If this is a packable field, this will be the decoder for the packed version of the field.
 	packedDec decoder
 }
-
 ```
 
 在 Properties 这个结构体中，定义了名为 enc 的 encoder 和名为 dec 的 decoder。
 
 encoder 和 decoder 函数定义是完全一样的。
 
-```go
+```
 type encoder func(p *Buffer, prop *Properties, base structPointer) error
 ```
 
-```go
+```
 type decoder func(p *Buffer, prop *Properties, base structPointer) error
-
 ```
 
 encoder 和 decoder 函数初始化是在 Properties 中：
 
-```go
+```
 // Initialize the fields for encoding and decoding.
 func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lockGetProp bool) {
 	// 下面代码有删减，类似的部分省略了
@@ -401,7 +391,6 @@ func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lock
 	}
 	p.setTag(lockGetProp)
 }
-
 ```
 
 上面代码中，分别把各个类型都进行 switch - case 枚举，每种情况都设置对应的 encode 编码器，decode 解码器，size 大小。proto2 和 proto3 有区别的地方也分成2种不同的情况进行处理。
@@ -410,10 +399,9 @@ func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lock
 
 下面主要挑 3 类，Int32、String、Map 代码实现进行分析。
 
-
 ### 1. Int32
 
-```go
+```
 func (o *Buffer) enc_proto3_int32(p *Properties, base structPointer) error {
 	v := structPointer_Word32Val(base, p.field)
 	x := int32(word32Val_Get(v)) // permit sign extension to use full 64-bit range
@@ -428,7 +416,7 @@ func (o *Buffer) enc_proto3_int32(p *Properties, base structPointer) error {
 
 处理 Int32 代码比较简单，先把 tagcode 放进 buf 二进制数据流缓冲区，接着序列化 Int32 ，序列化以后紧接着 tagcode 后面放进缓冲区。
 
-```go
+```
 // EncodeVarint writes a varint-encoded integer to the Buffer.
 // This is the format for the
 // int32, int64, uint32, uint64, bool, and enum
@@ -443,11 +431,11 @@ func (p *Buffer) EncodeVarint(x uint64) error {
 }
 ```
 
-Int32 的编码处理方法在[上篇](https://github.com/halfrost/Halfrost-Field/blob/master/contents/Protocol/Protocol-buffers-encode.md)里面讲过，用的 Varint 处理方法。上面这个函数同样适用于处理 int32, int64, uint32, uint64, bool, enum。
+Int32 的编码处理方法在上篇里面讲过，用的 Varint 处理方法。上面这个函数同样适用于处理 int32, int64, uint32, uint64, bool, enum。
 
 顺道也可以看看 sint32、Fixed32 的具体代码实现。
 
-```go
+```
 // EncodeZigzag32 writes a zigzag-encoded 32-bit integer
 // to the Buffer.
 // This is the format used for the sint32 protocol buffer type.
@@ -459,7 +447,7 @@ func (p *Buffer) EncodeZigzag32(x uint64) error {
 
 针对有符号的 sint32 ，采取的是先 Zigzag，然后在 Varint 的处理方式。
 
-```go
+```
 // EncodeFixed32 writes a 32-bit integer to the Buffer.
 // This is the format for the
 // fixed32, sfixed32, and float protocol buffer types.
@@ -477,8 +465,7 @@ func (p *Buffer) EncodeFixed32(x uint64) error {
 
 ### 2. String
 
-
-```go
+```
 func (o *Buffer) enc_proto3_string(p *Properties, base structPointer) error {
 	v := *structPointer_StringVal(base, p.field)
 	if v == "" {
@@ -492,7 +479,7 @@ func (o *Buffer) enc_proto3_string(p *Properties, base structPointer) error {
 
 序列化字符串也分2步，先把 tagcode 放进去，然后再序列化数据。
 
-```go
+```
 // EncodeStringBytes writes an encoded string to the Buffer.
 // This is the format used for the proto2 string type.
 func (p *Buffer) EncodeStringBytes(s string) error {
@@ -504,11 +491,9 @@ func (p *Buffer) EncodeStringBytes(s string) error {
 
 序列化字符串的时候，会先把字符串的长度通过编码 Varint 的方式，写到 buf 中。长度后面再紧跟着 string。这也就是 tag - length - value 的实现。
 
-
 ### 3. Map
 
-
-```go
+```
 // Encode a map field.
 func (o *Buffer) enc_new_map(p *Properties, base structPointer) error {
 	var state errorState // XXX: or do we need to plumb this through?
@@ -548,7 +533,7 @@ func (o *Buffer) enc_new_map(p *Properties, base structPointer) error {
 
 上述代码也可以序列化字典数组，例如：
 
-```go
+```
 map<key_type, value_type> map_field = N;
 ```
 
@@ -559,13 +544,13 @@ message MapFieldEntry {
 		key_type key = 1;
 		value_type value = 2;
 }
+
 repeated MapFieldEntry map_field = N;
 ```
 
-map 序列化是针对每个 k-v ，都先放入 tagcode ，然后再序列化 k-v。这里需要化未知长度的结构体的时候需要调用 enc\_len\_thing() 方法。
+map 序列化是针对每个 k-v ，都先放入 tagcode ，然后再序列化 k-v。这里需要化未知长度的结构体的时候需要调用 enc_len_thing() 方法。
 
-
-```go
+```
 // Encode something, preceded by its encoded length (as a varint).
 func (o *Buffer) enc_len_thing(enc func() error, state *errorState) error {
 	iLen := len(o.buf)
@@ -595,14 +580,13 @@ func (o *Buffer) enc_len_thing(enc func() error, state *errorState) error {
 }
 ```
 
-enc\_len\_thing() 方法会先预存 4 个字节的长度空位。序列化以后算出长度。如果长度比 4 个字节还要长，则右移序列化的二进制数据，把长度填到 tagcode 和数据之间。如果长度小于 4 个字节，相应的要左移。
-
+enc_len_thing() 方法会先预存 4 个字节的长度空位。序列化以后算出长度。如果长度比 4 个字节还要长，则右移序列化的二进制数据，把长度填到 tagcode 和数据之间。如果长度小于 4 个字节，相应的要左移。
 
 ### 4. slice
 
 最后再举一个数组的例子。以 []int32 为例。
 
-```go
+```
 // Encode a slice of int32s ([]int32) in packed format.
 func (o *Buffer) enc_slice_packed_int32(p *Properties, base structPointer) error {
 	s := structPointer_Word32Slice(base, p.field)
@@ -630,20 +614,19 @@ func (o *Buffer) enc_slice_packed_int32(p *Properties, base structPointer) error
 
 ### 序列化小结：
 
-Protocol Buffer 序列化采用 Varint、Zigzag 方法，压缩 int 型整数和带符号的整数。对浮点型数字不做压缩(这里可以进一步的压缩，Protocol Buffer 还有提升空间)。编码 `.proto` 文件，会对 option 和 repeated 字段进行检查，若 optional 或 repeated 字段没有被设置字段值，那么该字段在序列化时的数据中是完全不存在的，即不进行序列化（少编码一个字段）。
-
-上面这两点做到了压缩数据，序列化工作量减少。
-
-序列化的过程都是二进制的位移，速度非常快。数据都以 tag - length - value (或者 tag - value)的形式存在二进制数据流中。采用了 TLV 结构存储数据以后，也摆脱了 JSON 中的 {、}、; 、这些分隔符，没有这些分隔符也算是再一次减少了一部分数据。
-
-这一点做到了序列化速度非常快。
+> Protocol Buffer 序列化采用 Varint、Zigzag 方法，压缩 int 型整数和带符号的整数。对浮点型数字不做压缩(这里可以进一步的压缩，Protocol Buffer 还有提升空间)。编码 .proto 文件，会对 option 和 repeated 字段进行检查，若 optional 或 repeated 字段没有被设置字段值，那么该字段在序列化时的数据中是完全不存在的，即不进行序列化（少编码一个字段）。
+> 
+> 上面这两点做到了压缩数据，序列化工作量减少。
+> 
+> 序列化的过程都是二进制的位移，速度非常快。数据都以 tag - length - value (或者 tag - value)的形式存在二进制数据流中。采用了 TLV 结构存储数据以后，也摆脱了 JSON 中的 {、}、; 、这些分隔符，没有这些分隔符也算是再一次减少了一部分数据。
+> 
+> 这一点做到了序列化速度非常快。
 
 ## 二. protocol buffers 反序列化
 
 反序列化的实现完全是序列化实现的逆过程。
 
-
-```go
+```
 func Unmarshal(buf []byte, pb Message) error {
 	pb.Reset()
 	return UnmarshalMerge(buf, pb)
@@ -652,7 +635,7 @@ func Unmarshal(buf []byte, pb Message) error {
 
 在反序列化开始之前，先重置一下缓冲区。
 
-```go
+```
 func (p *Buffer) Reset() {
 	p.buf = p.buf[0:0] // for reading/writing
 	p.index = 0        // for reading
@@ -661,7 +644,7 @@ func (p *Buffer) Reset() {
 
 清空 buf 中的所有数据，并且重置 index。
 
-```go
+```
 func UnmarshalMerge(buf []byte, pb Message) error {
 	// If the object can unmarshal itself, let it.
 	if u, ok := pb.(Unmarshaler); ok {
@@ -673,17 +656,16 @@ func UnmarshalMerge(buf []byte, pb Message) error {
 
 反序列化数据的开始从上面这个函数开始，如果传进来的 message 的结果和 buf 结果不匹配，最终得到的结果是不可预知的。反序列化之前，同样会先调用一下对应自己身自定义的 Unmarshal() 方法。
 
-```go
+```
 type Unmarshaler interface {
 	Unmarshal([]byte) error
 }
 ```
-
 Unmarshal() 是一个可以自己实现的接口。
 
 UnmarshalMerge 中会调用 Unmarshal(pb Message) 方法。
 
-```go
+```
 func (p *Buffer) Unmarshal(pb Message) error {
 	// If the object can unmarshal itself, let it.
 	if u, ok := pb.(Unmarshaler); ok {
@@ -711,7 +693,7 @@ Unmarshal(pb Message) 这个函数只有一个入参，和 proto.Unmarshal() 方
 
 这两个函数最终都会调用 unmarshalType() 方法，这个函数是最终支持反序列化的函数。
 
-```go
+```
 func (o *Buffer) unmarshalType(st reflect.Type, prop *StructProperties, is_group bool, base structPointer) error {
 	var state errorState
 	required, reqFields := prop.reqCount, uint64(0)
@@ -773,16 +755,15 @@ func (o *Buffer) unmarshalType(st reflect.Type, prop *StructProperties, is_group
 }
 ```
 
-unmarshalType() 函数比较长，里面处理的情况比较多，有 oneof，WireEndGroup 。真正处理反序列化的函数在 `decErr := dec(o, p, base)` 这一行。
+unmarshalType() 函数比较长，里面处理的情况比较多，有 oneof，WireEndGroup 。真正处理反序列化的函数在 decErr := dec(o, p, base) 这一行。
 
 dec 函数在 Properties 的 setEncAndDec() 函数中进行了初始化。上面序列化的时候谈到过那个函数了，这里就不再赘述了。dec() 函数针对每个不同类型都有对应的反序列化函数。
 
 同样的，接下来也举 4 个例子，看看反序列化的实际代码实现。
 
-
 ### 1. Int32
 
-```go
+```
 func (o *Buffer) dec_proto3_int32(p *Properties, base structPointer) error {
 	u, err := p.valDec(o)
 	if err != nil {
@@ -795,7 +776,7 @@ func (o *Buffer) dec_proto3_int32(p *Properties, base structPointer) error {
 
 反序列化 Int32 代码比较简单，原理是按照 encode 的逆过程，还原原来的数据。
 
-```go
+```
 func (p *Buffer) DecodeVarint() (x uint64, err error) {
 	i := p.index
 	buf := p.buf
@@ -898,7 +879,7 @@ Int32 序列化之后，第一个字节一定是 0x80，那么除去这个字节
 
 顺道也可以看看 sint32、Fixed32 的反序列化具体代码实现。
 
-```go
+```
 func (p *Buffer) DecodeZigzag32() (x uint64, err error) {
 	x, err = p.DecodeVarint()
 	if err != nil {
@@ -911,8 +892,7 @@ func (p *Buffer) DecodeZigzag32() (x uint64, err error) {
 
 针对有符号的 sint32 ，反序列化的过程就是先反序列 Varint，再反序列化 Zigzag。
 
-
-```go
+```
 func (p *Buffer) DecodeFixed32() (x uint64, err error) {
 	// x, err already 0
 	i := p.index + 4
@@ -930,12 +910,11 @@ func (p *Buffer) DecodeFixed32() (x uint64, err error) {
 }
 ```
 
-Fixed32 反序列化的过程也是通过位移，每个字节的内容都累加，就可以还原出原先的数据。注意这里也要先跳过 tag 的位置。 
+Fixed32 反序列化的过程也是通过位移，每个字节的内容都累加，就可以还原出原先的数据。注意这里也要先跳过 tag 的位置。
 
 ### 2. String
 
-
-```go
+```
 func (p *Buffer) DecodeRawBytes(alloc bool) (buf []byte, err error) {
 	n, err := p.DecodeVarint()
 	if err != nil {
@@ -969,8 +948,7 @@ func (p *Buffer) DecodeRawBytes(alloc bool) (buf []byte, err error) {
 
 ### 3. Map
 
-
-```go
+```
 func (o *Buffer) dec_new_map(p *Properties, base structPointer) error {
 	raw, err := o.DecodeRawBytes(false)
 	if err != nil {
@@ -1021,14 +999,13 @@ func (o *Buffer) dec_new_map(p *Properties, base structPointer) error {
 	return nil
 }
 ```
-
 反序列化 map 需要把每个 tag 取出来，然后紧接着反序列化每个 key - value。最后会判断 keyelem 和 valelem 是否为零值，如果是零值要分别调用 reflect.Zero 处理零值的情况。
 
 ### 4. slice
 
 最后还是举一个数组的例子。以 []int32 为例。
 
-```go
+```
 func (o *Buffer) dec_slice_packed_int32(p *Properties, base structPointer) error {
 	v := structPointer_Word32Slice(base, p.field)
 
@@ -1059,15 +1036,13 @@ func (o *Buffer) dec_slice_packed_int32(p *Properties, base structPointer) error
 
 ### 反序列化小结：
 
-Protocol Buffer 反序列化直接读取二进制字节数据流，反序列化就是 encode 的反过程，同样是一些二进制操作。反序列化的时候，通常只需要用到 length。tag 值只是用来标识类型的，Properties 的 setEncAndDec() 方法里面已经把每个类型对应的 decode 解码器初始化好了，所以反序列化的时候，tag 值可以直接跳过，从 length 开始处理。
-
-XML 的解析过程就复杂一些。XML 需要从文件中读取出字符串，再转换为 XML 文档对象结构模型。之后，再从 XML 文档对象结构模型中读取指定节点的字符串，最后再将这个字符串转换成指定类型的变量。这个过程非常复杂，其中将 XML 文件转换为文档对象结构模型的过程通常需要完成词法文法分析等大量消耗 CPU 的复杂计算。
-
-
+> Protocol Buffer 反序列化直接读取二进制字节数据流，反序列化就是 encode 的反过程，同样是一些二进制操作。反序列化的时候，通常只需要用到 length。tag 值只是用来标识类型的，Properties 的 setEncAndDec() 方法里面已经把每个类型对应的 decode 解码器初始化好了，所以反序列化的时候，tag 值可以直接跳过，从 length 开始处理。
+> 
+> XML 的解析过程就复杂一些。XML 需要从文件中读取出字符串，再转换为 XML 文档对象结构模型。之后，再从 XML 文档对象结构模型中读取指定节点的字符串，最后再将这个字符串转换成指定类型的变量。这个过程非常复杂，其中将 XML 文件转换为文档对象结构模型的过程通常需要完成词法文法分析等大量消耗 CPU 的复杂计算。
 
 ## 三. 序列化 / 反序列化性能
 
-Protocol Buffer 一直被人们认为是高性能的存在。也有很多人做过实现，验证了这一说法。例如这个链接里面的实验 [jvm-serializers](https://github.com/eishay/jvm-serializers/wiki)。
+Protocol Buffer 一直被人们认为是高性能的存在。也有很多人做过实现，验证了这一说法。例如这个链接里面的实验 jvm-serializers。
 
 在看数据之前，我们可以先理性的分析一下 Protocol Buffer 和 JSON、XML 这些比有哪些优势：
 
@@ -1076,18 +1051,13 @@ Protocol Buffer 一直被人们认为是高性能的存在。也有很多人做�
 
 下面这张图来自参考链接里面的 《Protobuf有没有比JSON快5倍？用代码来击破pb性能神话》：
 
-<p align='center'>
-<img src='../images/pb_json_0.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/85_1.png)
 
 从这个实验来看，确实 Protobuf 在序列化数字这方面性能是非常强悍的。
 
 序列化 / 反序列化数字确实是 Protobuf 针对 JSON 和 XML 的优势，但是它也存在一些没有优势的地方。比如字符串。字符串在 Protobuf 中基本没有处理，除了前面加了 tag - length 。在序列化 / 反序列化字符串的过程中，字符串拷贝的速度反而决定的真正的速度。
 
-
-<p align='center'>
-<img src='../images/pb_json_1.png'>
-</p>
+![](https://img.halfrost.com/Blog/ArticleImage/85_2.png)
 
 从上图可以看到 encode 字符串的时候，速度基本和 JSON 相差无几。
 
@@ -1100,27 +1070,18 @@ protocol buffers 诞生之初也并不是为了传输数据存在的，只是为
 想用 protocol buffers 替换 JSON，可能是考虑到：
 
 1. protocol buffers 相同数据，传输的数据量比 JSON 小，gzip 或者 7zip 压缩以后，网络传输消耗较少。
-2. protocol buffers 不是自我描述的，在缺少 `.proto` 文件以后，有一定的加密性，数据传输过程中都是二进制流，并不是明文。
+2. protocol buffers 不是自我描述的，在缺少 .proto 文件以后，有一定的加密性，数据传输过程中都是二进制流，并不是明文。
 3. protocol buffers 提供了一套工具，自动化生成代码也非常方便。
 4. protocol buffers 具有向后兼容性，改变了数据结构以后，对老的版本没有影响。
 5. protocol buffers 原生完美兼容 RPC 调用。
-
 
 如果很少用到整型数字，浮点型数字，全部都是字符串数据，那么 JSON 和 protocol buffers 性能不会差太多。纯前端之间交互的话，选择 JSON 或者 protocol buffers 差别不是很大。
 
 与后端交互过程中，用到 protocol buffers 比较多，笔者认为选择 protocol buffers 除了性能强以外，完美兼容 RPC 调用也是一个重要因素。
 
-------------------------------------------------------
-
-Reference：  
-
-[google 官方文档](https://developers.google.com/protocol-buffers/docs/overview)      
-[thrift-protobuf-compare - Benchmarking.wiki](https://code.google.com/archive/p/thrift-protobuf-compare/wikis/Benchmarking.wiki)    
-[jvm-serializers](https://github.com/eishay/jvm-serializers/wiki)  
-[Protobuf有没有比JSON快5倍？用代码来击破pb性能神话](https://mp.weixin.qq.com/s?__biz=MzA3NDcyMTQyNQ==&mid=2649257430&idx=1&sn=975b6123d8256221f6bac3b99e52af9a&chksm=8767a428b0102d3e6ab7abdf797c481da570cb29e274aa4ff6ecd931f535166b776e6548941d&scene=0&key=399a205ce674169cbedcc1c459650908e22d6a2b81674195c3b251114acdf821dbde7bb49102c6b47f61b26a7a404d74e0e8440cea3675a7ea8f49eafd8639bfb733183a1bfb4603232d6cb8ecd230e5&ascene=0&uin=NTkxMDk2NjU=&devicetype=iMac+MacBookPro12,1+OSX+OSX+10.12.4+build(16E195)&version=12020510&nettype=WIFI&fontScale=100&pass_ticket=wHPj0w18CV8zHl6HCfd9t9LQfs3I0ZULhUILuOHgL0E=)
-
-> GitHub Repo：[Halfrost-Field](https://github.com/halfrost/Halfrost-Field)
+> Reference：
 > 
-> Follow: [halfrost · GitHub](https://github.com/halfrost)
->
-> Source: [https://halfrost.com/protobuf\_decode/](https://halfrost.com/protobuf_decode/)
+> - [google 官方文档](https://developers.google.com/protocol-buffers/docs/overview)
+> - [thrift-protobuf-compare - Benchmarking.wiki](https://code.google.com/archive/p/thrift-protobuf-compare/wikis/Benchmarking.wiki)
+> - [jvm-serializers](https://github.com/eishay/jvm-serializers/wiki)
+> - [Protobuf有没有比JSON快5倍？用代码来击破pb性能神话](https://mp.weixin.qq.com/s?__biz=MzA3NDcyMTQyNQ==&mid=2649257430&idx=1&sn=975b6123d8256221f6bac3b99e52af9a&chksm=8767a428b0102d3e6ab7abdf797c481da570cb29e274aa4ff6ecd931f535166b776e6548941d&scene=0&key=399a205ce674169cbedcc1c459650908e22d6a2b81674195c3b251114acdf821dbde7bb49102c6b47f61b26a7a404d74e0e8440cea3675a7ea8f49eafd8639bfb733183a1bfb4603232d6cb8ecd230e5&ascene=0&uin=NTkxMDk2NjU=&devicetype=iMac+MacBookPro12,1+OSX+OSX+10.12.4+build(16E195)&version=12020510&nettype=WIFI&fontScale=100&pass_ticket=wHPj0w18CV8zHl6HCfd9t9LQfs3I0ZULhUILuOHgL0E=)
