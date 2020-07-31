@@ -1,9 +1,18 @@
+//******************************************************
+//> 原文链接：
+//> [Golang logrus 日志包及日志切割的实现 https://www.jb51.net/article/180448.htm](https://www.jb51.net/article/180448.htm)
+//> [Logrus基本用法 https://www.jianshu.com/p/2d90b32acade](https://www.jianshu.com/p/2d90b32acade)
+//> [bilibili代码基础日志组件 https://github.com/bilibili/sniper/blob/master/util/log/log.go#L61](https://github.com/bilibili/sniper/blob/master/util/log/log.go#L61)
+//
+//> GitHub：[https://github.com/sirupsen/logrus](https://github.com/sirupsen/logrus)
+//> doc：[https://godoc.org/github.com/sirupsen/logrus](https://godoc.org/github.com/sirupsen/logrus)
+//
+//******************************************************
+
 package log_helper
 
 import (
 	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/sirupsen/logrus"
@@ -11,90 +20,28 @@ import (
 	"time"
 )
 
-//******************************************************
-
-var defaultLogrusLogConfig = `
-{
-  "logrus_config": {
-    "outputPaths": "./log/retarget_request.log"
-  },
-  "lumberjack_config": {
-    "@filename": "日志文件的位置",
-    "filename": "./log/retarget_request.log",
-    "@rotation_time": "日志切割时间间隔，单位：m",
-    "rotation_time": 60,
-    "@maxage": "保留旧文件的最大时常，单位：h",
-    "maxage": 3
-  },
-  "option": {
-    "formatter": "text",
-    "fields_order": [
-      
-    ]
-  }
-}
-`
-
-type LogrusWithFileRotatelogsConfig struct {
-	LogrusConfig         LogrusConfig         `json:"logrus_config"`
-	FileRotatelogsConfig FileRotatelogsConfig `json:"file_rotatelogs_config"`
-	Option               struct {
-		Formatter   string   `json:"formatter"` // json | test | requestFormatter
-		FieldsOrder []string `json:"fields_order"`
-	}
-}
-
-type LogrusConfig struct {
-	OutputPaths string `json:"outputPaths"`
-}
-
-type FileRotatelogsConfig struct {
-	Filename     string `json:"filename"`
-	Maxage       int    `json:"maxage"`
-	RotationTime int    `json:"rotation_time"`
-}
-
-func NewDefaultLogrusWithFileRotatelogs() (*logrus.Logger, error) {
-	var cfg LogrusWithFileRotatelogsConfig
-	if err := json.Unmarshal([]byte(defaultLogrusLogConfig), &cfg); err != nil {
-		return nil, err
-	}
-	return NewLogrusWithFileRotatelogs(cfg)
-}
-
-func NewLogrusWithFileRotatelogs(cfg LogrusWithFileRotatelogsConfig) (*logrus.Logger, error) {
-	if len(cfg.LogrusConfig.OutputPaths) == 0 {
-		return nil, errors.New("not set cfg.OutputPaths")
+func NewLogrusWithFileRotatelogs(outputPath string) *logrus.Logger {
+	if len(outputPath) == 0 {
+		outputPath = "stdout"
 	}
 
 	writer, err := rotatelogs.New(
-		cfg.LogrusConfig.OutputPaths+".%Y-%m-%d-%H",
-		rotatelogs.WithLinkName(cfg.FileRotatelogsConfig.Filename),                                    // 生成软链，指向最新日志文件
-		rotatelogs.WithMaxAge(time.Duration(cfg.FileRotatelogsConfig.Maxage)*time.Hour),               // 文件最大保存时间
-		rotatelogs.WithRotationTime(time.Duration(cfg.FileRotatelogsConfig.RotationTime)*time.Minute), // 日志切割时间间隔
-		//rotatelogs.WithRotationCount()                                                               // 保存日志个数，默认 7，不能与 MaxAge 同时设置
+		outputPath+".%Y-%m-%d-%H",
+		rotatelogs.WithLinkName(outputPath),                        // 生成软链，指向最新日志文件
+		rotatelogs.WithMaxAge(time.Duration(3)*time.Hour),          // 文件最大保存时间
+		rotatelogs.WithRotationTime(time.Duration(60)*time.Minute), // 日志切割时间间隔
+		//rotatelogs.WithRotationCount()                            // 保存日志个数，默认 7，不能与 MaxAge 同时设置
 	)
 	if err != nil {
-		return nil, err
+		fmt.Println("rotatelogs.New ", outputPath, "error=", err)
 	}
 
 	logger := logrus.New()
-
-	switch cfg.Option.Formatter {
-	case "json":
-		logger.SetFormatter(&logrus.JSONFormatter{})
-	case "text":
-		logger.SetFormatter(&logrus.TextFormatter{})
-	case "request":
-		logger.SetFormatter(&RequestLogFormatter{
-			FieldsOrder: cfg.Option.FieldsOrder,
-		})
-	}
-
+	logger.SetFormatter(&logrus.JSONFormatter{})
 	logger.SetOutput(writer)
 	logger.SetLevel(logrus.InfoLevel)
 
-	return logger, nil
+	return logger
 }
 
 // -------- RequestLogFormatter ----------

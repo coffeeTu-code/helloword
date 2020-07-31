@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package grpc_template;
+
+import "sum.proto";
+
+service RpcTemplateService {
+    rpc Sum (RpcTemplateRequest) returns (RpcTemplateResponse);
+}
+
