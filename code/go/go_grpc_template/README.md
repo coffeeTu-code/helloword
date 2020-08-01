@@ -4,3 +4,13 @@
 
 # 目录
 
+
+# 服务注册 与 服务发现
+
+本地启动 consul
+
+```shell script
+
+[root@hdp2 ~]# consul agent -dev
+
+```

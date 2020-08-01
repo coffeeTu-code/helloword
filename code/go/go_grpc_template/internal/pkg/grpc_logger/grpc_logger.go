@@ -8,6 +8,10 @@ import (
 
 var Grpc_logger RPCLog
 
+func init() {
+	Grpc_logger.Init()
+}
+
 type RPCLog struct {
 	Request *logrus.Logger
 
@@ -24,7 +28,7 @@ func (log *RPCLog) Init() (err error) {
 }
 
 //****************** Request Log **********************
-func (log *RPCLog) Req(fields logrus.Fields) {
+func (log *RPCLog) RequestInfo(fields logrus.Fields) {
 	if log.Request != nil {
 		log.Request.WithFields(fields).Info("")
 	}
