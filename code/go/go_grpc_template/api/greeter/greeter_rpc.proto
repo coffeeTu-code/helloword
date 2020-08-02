@@ -1,3 +1,5 @@
+// greeter_rpc.proto 将协议代码和 rpc 服务代码分离
+
 syntax = "proto3";
 
 package grpc_template;

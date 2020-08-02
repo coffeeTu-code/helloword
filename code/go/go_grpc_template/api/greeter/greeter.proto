@@ -1,3 +1,5 @@
+// greeter.proto 问候语协议
+
 syntax = "proto3";
 
 package grpc_template;
