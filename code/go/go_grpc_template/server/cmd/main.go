@@ -6,8 +6,9 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/oklog/oklog/pkg/group"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	greeter "helloword/code/go/go_grpc_template/api/greeter/go"
-	"helloword/code/go/go_grpc_template/internal/app/greeter_server"
+	"helloword/code/go/go_grpc_template/server/internal/app/greeter_server"
 	"net"
 	"net/http"
 	"os"
@@ -20,10 +21,8 @@ import (
 func main() {
 	fs := flag.NewFlagSet("greetersvc", flag.ExitOnError)
 	var (
-		consulAddr = fs.String("consul.addr", "", "Consul Address")
-		consulPort = fs.String("consul.port", "8500", "Consul Port")
-		httpPort   = fs.String("http.port", "9110", "HTTP Listen Port")
-		grpcPort   = fs.String("grpc-addr", "9120", "gRPC listen address")
+		httpPort = fs.String("http.port", "9110", "HTTP Listen Port")
+		grpcPort = fs.String("grpc-addr", "9120", "gRPC listen address")
 	)
 	fs.Usage = usageFor(fs, os.Args[0]+" [flags]")
 	fs.Parse(os.Args[1:])
@@ -41,7 +40,7 @@ func main() {
 	var (
 		endpoints   = greeter_server.MakeServerEndpoints(service)
 		httpHandler = greeter_server.NewHTTPHandler(endpoints)
-		registar    = greeter_server.ConsulRegister(*consulAddr, *consulPort, *httpPort, *grpcPort)
+		registar    = greeter_server.ConsulRegister(*grpcPort)
 		grpcServer  = greeter_server.NewGRPCServer(endpoints)
 	)
 
@@ -56,7 +55,7 @@ func main() {
 			Handler:        httpHandler,
 		}
 		g.Add(func() error {
-			logger.Log("transport", "HTTP", "addr", "localhost", "port", *httpPort)
+			logger.Log("transport", "HTTP", "port", *httpPort)
 			return httpServer.ListenAndServe()
 		}, func(err error) {
 			_ = httpServer.Close()
@@ -74,6 +73,7 @@ func main() {
 			logger.Log("transport", "gRPC", "port", *grpcPort)
 			baseServer := grpc.NewServer()
 			greeter.RegisterGreeterServer(baseServer, grpcServer)
+			grpc_health_v1.RegisterHealthServer(baseServer, &greeter_server.Health{})
 			return baseServer.Serve(grpcListener)
 		}, func(err error) {
 			registar.Deregister()

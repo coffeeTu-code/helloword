@@ -2,14 +2,17 @@ package greeter_server
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
+	jsoniter "github.com/json-iterator/go"
 	greeter "helloword/code/go/go_grpc_template/api/greeter/go"
 	"net/http"
 
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 )
+
+//快速的 json 库，替代原生 json 编解码
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 var (
 	// 当缺少预期的路径变量时，将返回 ErrBadRouting。

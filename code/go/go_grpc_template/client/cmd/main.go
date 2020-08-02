@@ -3,29 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/bj-wangjia/go-kit/balancer"
 	"google.golang.org/grpc"
 	greeter "helloword/code/go/go_grpc_template/api/greeter/go"
+	"helloword/code/go/go_grpc_template/client/internal/app/greeter_client"
 	"time"
 )
 
 func main() {
-	consulResolver, err := balancer.NewConsulResolver(
-		":8500",
-		"go-kit-srv-greeter",
-		"go-kit-client-greeter",
-		time.Duration(1)*time.Second,
-		3,
-		60,
-		"",
-	)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 
-	node := consulResolver.DiscoverNode()
+	var (
+		discover = greeter_client.ConsulDiscover()
+	)
+
+	node := discover.DiscoverNode()
 	if node == nil || len(node.Address) == 0 {
+		fmt.Println(node)
 		return
 	}
 	fmt.Println(node)
@@ -51,6 +43,4 @@ func main() {
 		return
 	}
 	fmt.Println(response)
-
-	time.Sleep(1 * time.Minute)
 }
