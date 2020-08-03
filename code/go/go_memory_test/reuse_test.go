@@ -20,6 +20,8 @@ func TestReuseSlice(t *testing.T) {
 				header2 := (*reflect.SliceHeader)(unsafe.Pointer(&si2))
 				fmt.Println(header1.Data)
 				fmt.Println(header2.Data)
+				//824633852304
+				//824635138048
 				So(header1.Data, ShouldNotEqual, header2.Data)
 			})
 		})
@@ -32,6 +34,8 @@ func TestReuseSlice(t *testing.T) {
 				header2 := (*reflect.SliceHeader)(unsafe.Pointer(&si2))
 				fmt.Println(header1.Data)
 				fmt.Println(header2.Data)
+				//824633852464
+				//824633852464
 				So(header1.Data, ShouldEqual, header2.Data)
 			})
 
@@ -42,6 +46,8 @@ func TestReuseSlice(t *testing.T) {
 					header2 := (*reflect.SliceHeader)(unsafe.Pointer(&si2))
 					fmt.Println(header1.Data)
 					fmt.Println(header2.Data)
+					//824633852544
+					//824633852544
 					So(header1.Data, ShouldEqual, header2.Data)
 					So(si1[7], ShouldEqual, 10)
 				})
@@ -52,21 +58,27 @@ func TestReuseSlice(t *testing.T) {
 			si := make([]int, 10, 10)
 			header := (*reflect.SliceHeader)(unsafe.Pointer(&si))
 			fmt.Println(header.Data)
+			//824635247488
 			si = make([]int, 100, 100)
 			header = (*reflect.SliceHeader)(unsafe.Pointer(&si))
 			fmt.Println(header.Data)
+			//824635248368
 			si = make([]int, 1000, 1000)
 			header = (*reflect.SliceHeader)(unsafe.Pointer(&si))
 			fmt.Println(header.Data)
+			//824635258768
 			si = make([]int, 100, 100)
 			header = (*reflect.SliceHeader)(unsafe.Pointer(&si))
 			fmt.Println(header.Data)
+			//824635247568
 			si = make([]int, 200, 200)
 			header = (*reflect.SliceHeader)(unsafe.Pointer(&si))
 			fmt.Println(header.Data)
+			//824635249168
 			si = make([]int, 1000, 1000)
 			header = (*reflect.SliceHeader)(unsafe.Pointer(&si))
 			fmt.Println(header.Data)
+			//824635250768
 		})
 	})
 }
@@ -81,6 +93,8 @@ func TestReuseString(t *testing.T) {
 				header2 := (*reflect.StringHeader)(unsafe.Pointer(&str2))
 				fmt.Println(header1.Data)
 				fmt.Println(header2.Data)
+				//19799455
+				//19799455
 				So(header1.Data, ShouldEqual, header2.Data)
 			})
 		})
@@ -93,6 +107,8 @@ func TestReuseString(t *testing.T) {
 				header2 := (*reflect.StringHeader)(unsafe.Pointer(&str2))
 				fmt.Println(header1.Data, str1)
 				fmt.Println(header2.Data, str2)
+				//19799455 hello
+				//19799455 hello
 				So(str1, ShouldNotEqual, str2)
 				So(header1.Data, ShouldEqual, header2.Data)
 			})
@@ -106,6 +122,8 @@ func TestReuseString(t *testing.T) {
 				header2 := (*reflect.StringHeader)(unsafe.Pointer(&str2))
 				fmt.Println(header1.Data, str1)
 				fmt.Println(header2.Data, str2)
+				//19799455 hello
+				//19800562 hello
 				So(str1, ShouldEqual, str2)
 				So(header1.Data, ShouldNotEqual, header2.Data)
 			})
@@ -121,6 +139,8 @@ func TestMapReuse(t *testing.T) {
 		m2["three"] = 3
 		Println(m1)
 		Println(m2)
+		//map[one:10 three:3 two:2]
+		//map[one:10 three:3 two:2]
 		So(m1["one"], ShouldEqual, 10)
 		So(m2["one"], ShouldEqual, 10)
 		So(m1, ShouldResemble, m2)

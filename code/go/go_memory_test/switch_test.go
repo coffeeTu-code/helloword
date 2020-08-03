@@ -36,4 +36,9 @@ func BenchmarkSwitch(b *testing.B) {
 			}
 		}
 	})
+
+	//BenchmarkSwitch/benchmark_switch
+	//BenchmarkSwitch/benchmark_switch-12         	1000000000	         0.534 ns/op
+	//BenchmarkSwitch/benchmark_if
+	//BenchmarkSwitch/benchmark_if-12             	838191572	         1.25 ns/op
 }
