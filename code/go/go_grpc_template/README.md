@@ -30,6 +30,25 @@ go run code/go/go_grpc_template/server/cmd/main.go
 
 ```
 
+```shell script
+ go build -o ./code/go/go_grpc_template/server/cmd/go_grpc_template ./code/go/go_grpc_template/server/cmd/main.go
+
+# 制作镜像
+docker build -t go_grpc_template .
+# 查看镜像
+docker images
+# REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE
+# go_grpc_template         latest              a0d3c284621e        8 minutes ago       20.7MB
+# busybox                  latest              018c9d7b792b        13 days ago         1.22MB
+# docker/getting-started   latest              1f32459ef038        3 weeks ago         26.8MB
+# redislabs/rebloom        latest              03841e395ca0        4 weeks ago         104MB
+
+docker run -it -p 9120:9120 go_grpc_template
+
+
+
+```
+
 运行客户端测试
 
 ```shell script

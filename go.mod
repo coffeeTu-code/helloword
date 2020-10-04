@@ -6,10 +6,13 @@ go 1.14
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 
 require (
+	github.com/PuerkitoBio/goquery v1.5.1
+	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 
 	// go-kit 微服务组件
 	github.com/go-kit/kit v0.10.0
+	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.7.3
 
@@ -30,7 +33,7 @@ require (
 	github.com/miekg/dns v1.1.27 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 
-    // 文件切割器，通常搭配 zap 一起使用
+	// 文件切割器，通常搭配 zap 一起使用
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/oklog/oklog v0.3.2
@@ -43,6 +46,7 @@ require (
 	// go-test 框架
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/stretchr/testify v1.5.1 // indirect
+	github.com/tealeg/xlsx v1.0.5
 	github.com/tebeka/strftime v0.1.4 // indirect
 
 	// zap-logger 日志组件

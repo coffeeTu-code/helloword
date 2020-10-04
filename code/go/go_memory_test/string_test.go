@@ -109,3 +109,27 @@ func TestString(t *testing.T) {
 		})
 	})
 }
+
+func BenchmarkStringBuilder(b *testing.B) {
+	audienceIds := []string{"9000001", "9000002", "9000003", "9000004", "9000005", "9000006", "9000007", "9000008", "9000009"}
+	for i := 0; i < b.N; i++ {
+		var builder strings.Builder
+		size := len(audienceIds) - 1
+		for idx := 0; idx < size; idx++ {
+			builder.WriteString(audienceIds[idx])
+			builder.WriteString(",")
+		}
+		if size >= 0 {
+			builder.WriteString(audienceIds[size])
+		}
+	}
+	//BenchmarkStringBuilder-12    	 5671720	       224 ns/op
+}
+
+func BenchmarkStringJoin(b *testing.B) {
+	audienceIds := []string{"9000001", "9000002", "9000003", "9000004", "9000005", "9000006", "9000007", "9000008", "9000009"}
+	for i := 0; i < b.N; i++ {
+		strings.Join(audienceIds, ",")
+	}
+	//BenchmarkStringJoin-12    	 9586122	       116 ns/op
+}
