@@ -56,3 +56,14 @@ docker run -it -p 9120:9120 go_grpc_template
 go run code/go/go_grpc_template/client/cmd/main.go
 
 ```
+
+# 反思
+
+一个基本的 RPC Server 应该具有以下功能及详细的文档说明：
+- log
+- metrics
+- structure
+- docker run
+- configs parser
+- functional test and benchmark
+- example
